@@ -1,0 +1,119 @@
+========================================================================
+  DEMO NARRATION SCRIPT — Text-Based Selection & Volume Estimation
+  Read this aloud while recording. ~2 minutes. Pause where marked [PAUSE].
+========================================================================
+
+------------------------------------------------------------------------
+0. BEFORE YOU HIT RECORD (checklist — do not read aloud)
+------------------------------------------------------------------------
+  - App is running at  http://localhost:7862
+  - Browser zoomed to a comfortable level, window maximized
+  - Hard refresh once (Ctrl+Shift+R) so the latest UI loads
+  - Have a top-down photo of a pile ready to drag in
+  - Default mode is already "Prompted segmentation" — good
+
+------------------------------------------------------------------------
+1. INTRO  (camera on the full page)
+------------------------------------------------------------------------
+"Hi. In this demo I'll show our Volume Estimator, which measures the
+ volume of an object from a single top-down photo.
+
+ What's new here is text-based selection — instead of clicking or drawing
+ a box, I just type in plain English what I want to measure, and the app
+ finds it, outlines it, and estimates only that region."
+
+[PAUSE — let the page sit on screen for a second]
+
+------------------------------------------------------------------------
+2. THE MODELS  (optional — keep if the audience is technical)
+------------------------------------------------------------------------
+"Under the hood it uses two models: Depth Anything V2 for metric depth,
+ which gave us the most accurate results, and LangSAM — that's Grounding
+ DINO plus SAM 2.1 — for the text-driven segmentation."
+
+------------------------------------------------------------------------
+3. UPLOAD  (Step 1 panel)
+------------------------------------------------------------------------
+"First, Step 1 — I upload a top-down photo of the pile inside the
+ calibration frame."
+
+[ACTION: drag the image into the upload box, wait for it to appear]
+
+------------------------------------------------------------------------
+4. TEXT SELECTION  (Step 2 panel — this is the key moment)
+------------------------------------------------------------------------
+"Now the important part — Step 2, 'What do you want to measure?'
+
+ The selection method is set to 'Prompted segmentation', and here in the
+ text box I simply describe the object."
+
+[ACTION: click the prompt box, clear it, type:  waste pile ]
+
+"I'll type 'waste pile'. That's it — no clicking on the image, no drawing.
+ You could just as easily type 'cardboard boxes' or 'sand heap' and it
+ would target that instead."
+
+------------------------------------------------------------------------
+5. CALIBRATION  (Step 3 panel)
+------------------------------------------------------------------------
+"Step 3 lets me pick a calibration preset. I'll leave it on the global
+ median, which matches our reference setup."
+
+------------------------------------------------------------------------
+6. RUN  (the Estimate button)
+------------------------------------------------------------------------
+"And now I press 'Estimate volume'."
+
+[ACTION: click Estimate. While it runs:]
+
+"It's running depth estimation and segmentation now — this takes a few
+ seconds on the GPU."
+
+[PAUSE — wait for results to render]
+
+------------------------------------------------------------------------
+7. RESULTS  (point at each part)
+------------------------------------------------------------------------
+"And here are the results.
+
+ At the top we get the calibrated volume in litres and the estimated mass
+ in kilograms.
+
+ Below that: the raw volume, the mean and maximum height of the pile, and
+ the coverage — how much of the frame the object filled.
+
+ There's also a depth-sanity badge confirming the centre reads closer than
+ the edges, which tells us the depth map is sensible."
+
+[ACTION: switch the visualization tabs on the right]
+
+"On the right I can switch between three views:
+   - the Height heatmap, showing where the pile is tallest,
+   - the Depth map,
+   - and the Mask, which shows exactly what my text prompt selected."
+
+[ACTION: open the 'Mask' tab so viewers see the outlined region]
+
+"Notice the mask matches only the pile I described — that's the
+ text-based selection working."
+
+------------------------------------------------------------------------
+8. SECOND PROMPT  (optional — shows flexibility)
+------------------------------------------------------------------------
+"To show how flexible this is, let me change the prompt to something else
+ in the same image and re-run."
+
+[ACTION: type a different object, e.g.  cardboard boxes , press Estimate]
+
+"Same photo, different target — selected purely from the text."
+
+------------------------------------------------------------------------
+9. CLOSE
+------------------------------------------------------------------------
+"So that's the workflow: upload a photo, type what to measure, and get a
+ calibrated volume and mass — with no manual annotation. Thanks for
+ watching."
+
+========================================================================
+  END
+========================================================================

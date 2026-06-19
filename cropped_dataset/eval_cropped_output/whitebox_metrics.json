@@ -1,0 +1,46 @@
+{
+  "summary": {
+    "pile1": {
+      "num_images": 5,
+      "mean_pred_volume_L": 2.9071442700062393,
+      "std_pred_volume_L": 0.08975633088291021,
+      "coefficient_of_variation_percent": 3.087439856664478,
+      "mean_density_kg_L": 0.3443037224605428,
+      "std_density_kg_L": 0.010484256088561811
+    }
+  },
+  "raw": {
+    "pile1": [
+      {
+        "image_name": "media__1776193827746.jpg",
+        "pred_volume_liters": 2.7922159154171617,
+        "density_kg_l": 0.358138492972023,
+        "box_area_px": 673600.0
+      },
+      {
+        "image_name": "media__1776193884546.png",
+        "pred_volume_liters": 2.905515687733008,
+        "density_kg_l": 0.34417298251803186,
+        "box_area_px": 404492.0
+      },
+      {
+        "image_name": "media__1776193905613.png",
+        "pred_volume_liters": 2.848330589916302,
+        "density_kg_l": 0.35108284253949085,
+        "box_area_px": 405744.0
+      },
+      {
+        "image_name": "media__1776193919736.png",
+        "pred_volume_liters": 2.930668296979374,
+        "density_kg_l": 0.34121910044568854,
+        "box_area_px": 409584.0
+      },
+      {
+        "image_name": "media__1776193937616.png",
+        "pred_volume_liters": 3.0589908599853515,
+        "density_kg_l": 0.3269051938274797,
+        "box_area_px": 409600.0
+      }
+    ]
+  }
+}

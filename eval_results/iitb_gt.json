@@ -1,0 +1,33 @@
+{
+    "_setup": {
+        "box_interior_length_m": 0.60,
+        "box_interior_width_m":  0.60,
+        "box_area_m2":           0.36,
+        "camera_height_m":       0.65,
+        "waste_type":            "mixed_solid_waste",
+        "waste_composition":     "plastic, paper, cardboard, metal cans, single-use wrappers",
+        "tare_mass_g":           270,
+        "gt_volume_note":        "20x30x30 cm geometric measurement; actual bulk volume larger due to fluffing"
+    },
+    "pile1": {
+        "gross_mass_g": 940,
+        "tare_mass_g":  270,
+        "mass_kg":      0.670,
+        "volume_L":     18.0,
+        "note":         "20cm height x 30cm x 30cm footprint = 18L geometric"
+    },
+    "pile2": {
+        "gross_mass_g": 750,
+        "tare_mass_g":  270,
+        "mass_kg":      0.480,
+        "volume_L":     18.0,
+        "note":         "same geometric measurement - fluff factor may differ"
+    },
+    "pile3": {
+        "gross_mass_g": 930,
+        "tare_mass_g":  270,
+        "mass_kg":      0.660,
+        "volume_L":     18.0,
+        "note":         "same geometric measurement - fluff factor may differ"
+    }
+}

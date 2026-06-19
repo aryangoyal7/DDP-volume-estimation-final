@@ -1,0 +1,41 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+\title{Solid Waste Dataset IITB Documentation}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+This dataset contains images of mixed solid waste, gathered at IITB, specifically designed for use in system calibration and evaluations for volume, mass, and density estimation algorithms. 
+
+\section{Data Collection Methodology}
+To capture the data, a fixed volume box was utilized. Mixed waste was placed into this box, and the total weight of the loaded material was physically measured. Since the exact boundary volume and the mass are known, it allows us to precisely determine the true mass, volume, and density of the waste. High resolution images were then taken pointing towards the setup. Furthermore, the same pile of waste was clicked in various configurations to observe how different orientations and packing arrangements affect the computational results.
+
+\section{Sample Images}
+Below are representative images showing how mixed waste piles look within the specified capturing setup.
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{pile1_sample.jpg}
+        \caption{Sample from Pile 1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{pile2_sample.jpg}
+        \caption{Sample from Pile 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{pile3_sample.jpg}
+        \caption{Sample from Pile 3}
+    \end{subfigure}
+    \caption{Samples from the solid waste dataset showing various pile configurations.}
+\end{figure}
+
+\end{document}

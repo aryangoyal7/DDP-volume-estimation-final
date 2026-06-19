@@ -1,0 +1,163 @@
+% =====================================================================
+%  Project update: Text-based selection for the Volume Estimator
+%  Compile from the slides/ directory:
+%     pdflatex update_text_selection.tex
+% =====================================================================
+\documentclass[aspectratio=169]{beamer}
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+
+% ---- palette (matches the portal) ----
+\definecolor{ink}{HTML}{0F172A}
+\definecolor{slate}{HTML}{475569}
+\definecolor{indigo}{HTML}{4F46E5}
+\definecolor{indigolt}{HTML}{EEF0FF}
+\definecolor{cardbg}{HTML}{FFFFFF}
+\definecolor{pagebg}{HTML}{F4F6FB}
+
+\setbeamercolor{normal text}{fg=ink}
+\setbeamercolor{frametitle}{fg=indigo}
+\setbeamercolor{structure}{fg=indigo}
+\setbeamercolor{background canvas}{bg=pagebg}
+\setbeamercolor{itemize item}{fg=indigo}
+\setbeamercolor{itemize subitem}{fg=slate}
+
+\setbeamerfont{frametitle}{series=\bfseries,size=\Large}
+\setbeamerfont{title}{series=\bfseries,size=\huge}
+
+% small helper for a soft "chip"
+\newcommand{\chip}[1]{\tikz[baseline=-0.6ex]\node[fill=indigolt,text=indigo,
+  rounded corners=4pt,inner sep=3pt,font=\footnotesize\bfseries]{#1};}
+
+\title{Volume Estimator --- Update}
+\subtitle{Text-Based Selection (Prompt-Driven Segmentation)}
+\author{Project Update}
+\date{\today}
+
+\begin{document}
+
+% ---------------------------------------------------------------- 1
+\begin{frame}[plain]
+  \vfill
+  \begin{center}
+    {\Huge\bfseries\color{ink} Volume Estimator}\\[4pt]
+    {\Large\color{indigo}\bfseries Update: Text-Based Selection}\\[14pt]
+    {\color{slate} Type what to measure --- the app finds it, outlines it,
+     and estimates only that region.}\\[20pt]
+    \chip{NEW} \quad \chip{Depth Anything V2} \quad \chip{LangSAM}\\[10pt]
+    {\small\color{slate}\today}
+  \end{center}
+  \vfill
+\end{frame}
+
+% ---------------------------------------------------------------- 2
+\begin{frame}{Why we added it}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{\color{ink}The problem}
+      \begin{itemize}
+        \item Earlier the app measured the \emph{whole frame} only --- no way to
+              isolate one object in a cluttered scene.
+        \item Manual masks (clicks / boxes) are slow and need a trained operator.
+      \end{itemize}
+      \vspace{6pt}
+      \textbf{\color{ink}The goal}
+      \begin{itemize}
+        \item Let \emph{anyone} pick the target in plain English.
+        \item Measure only the object of interest, not the background.
+        \item Keep the accurate depth pipeline that already worked best.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{What changed}
+        \centering\vspace{2pt}
+        {\color{slate}From}\\[2pt]
+        \chip{Full-frame only}\\[10pt]
+        {\large\color{indigo}$\Downarrow$}\\[8pt]
+        {\color{slate}To}\\[2pt]
+        \chip{Type ``waste pile'' $\rightarrow$ measured}
+        \vspace{2pt}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 3
+\begin{frame}{What's new: text-based selection}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \vspace{4pt}
+      Text selection is now the \textbf{default} mode:
+      \begin{enumerate}
+        \item Upload a top-down photo.
+        \item \textbf{Type} the object --- e.g.\ ``waste pile'',
+              ``cardboard boxes''.
+        \item Press \textbf{Estimate}.
+      \end{enumerate}
+      \vspace{4pt}
+      {\color{slate}\small No clicking on the image, no drawing boxes ---
+       the prompt box is front-and-centre, with larger, higher-contrast UI.}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.74\textheight,keepaspectratio]%
+        {images/portal_top.png}\\[2pt]
+      {\scriptsize\color{slate} The redesigned portal --- prompt-driven UI.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 4
+\begin{frame}{Under the hood}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{\color{ink}Pipeline}
+      \begin{enumerate}
+        \item \textbf{Text $\rightarrow$ mask:} LangSAM
+              (GroundingDINO + SAM~2.1) turns the prompt into a pixel mask.
+        \item \textbf{Depth:} Depth Anything~V2 (Metric Indoor) --- the model
+              that gave our best results.
+        \item \textbf{Height + volume:} floor-plane fit, calibrated scale,
+              integrate height inside the mask only.
+      \end{enumerate}
+      \vspace{4pt}
+      {\color{slate}\small Output: calibrated volume (L), mass (kg), plus
+       depth map, height heatmap and the selection mask.}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=0.74\textheight,keepaspectratio]%
+        {images/portal_results.png}\\[2pt]
+      {\scriptsize\color{slate} Live result: prompt ``waste pile'' measured
+       end-to-end.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 5
+\begin{frame}{Summary \& next steps}
+  \textbf{\color{ink}Shipped}
+  \begin{itemize}
+    \item Prompt-driven (text-based) selection --- now the default mode.
+    \item Same best-performing depth model (Depth Anything~V2).
+    \item Cleaner, larger, higher-contrast UI; full-frame mode still available.
+  \end{itemize}
+  \vspace{6pt}
+  \textbf{\color{ink}Next}
+  \begin{itemize}
+    \item Validate prompt segmentation accuracy across the IITB dataset.
+    \item Multi-object prompts and per-object volume breakdown.
+    \item Default the visual to the ``Mask'' tab so users see the selection.
+  \end{itemize}
+  \vspace{10pt}
+  \begin{center}\chip{Try it} \;\; {\color{slate}\small running locally at
+   \texttt{http://localhost:7862}}\end{center}
+\end{frame}
+
+\end{document}
