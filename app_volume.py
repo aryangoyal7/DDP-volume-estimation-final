@@ -33,6 +33,9 @@ PRESET_TEXT_THRESHOLD = 0.25
 # Volume presets
 PRESET_REAL_WORLD_HEIGHT_M = 1.0
 PRESET_REAL_WORLD_WIDTH_M = 1.0
+PRESET_SCENE_AREA_M2 = float(
+    os.getenv("SCENE_AREA_M2", str(PRESET_REAL_WORLD_HEIGHT_M * PRESET_REAL_WORLD_WIDTH_M))
+)
 PRESET_MIN_HEIGHT_THRESHOLD_M = 0.005
 PRESET_GROUND_PERCENTILE = 99.9
 PRESET_TARGET_GROUND_DEPTH_M: Optional[float] = None
@@ -181,9 +184,9 @@ def estimate_height_map(
     return height_map, ground_depth, depth_scale
 
 
-def pixel_area_m2(image_hw: Tuple[int, int], real_h: float, real_w: float) -> float:
+def pixel_area_m2(image_hw: Tuple[int, int], scene_area_m2: float) -> float:
     h, w = image_hw
-    return (real_h * real_w) / float(h * w)
+    return float(scene_area_m2) / float(h * w)
 
 
 def resize_mask_if_needed(mask: np.ndarray, target_hw: Tuple[int, int]) -> np.ndarray:
@@ -206,11 +209,13 @@ def height_to_colormap(height_map: np.ndarray, mask: np.ndarray) -> np.ndarray:
 # ----------------------------
 # Inference function
 # ----------------------------
-def run_app(image_path, text_prompt, mode, depth_map_path, density_kg_per_m3):
+def run_app(image_path, text_prompt, mode, depth_map_path, scene_area_m2, density_kg_per_m3):
     if not image_path:
         raise gr.Error("Please provide an input image.")
     if not text_prompt or not text_prompt.strip():
         raise gr.Error("Please provide a prompt.")
+    if scene_area_m2 is None or float(scene_area_m2) <= 0:
+        raise gr.Error("Scene area must be a positive value in m^2.")
 
     image_pil, image_np = load_image_rgb(image_path)
 
@@ -280,6 +285,7 @@ def run_app(image_path, text_prompt, mode, depth_map_path, density_kg_per_m3):
             f"- Prompt: `{text_prompt}`\n"
             f"- Detections: `{len(masks)}`\n"
             f"- Prompt mask coverage: `{float(np.mean(union_mask)*100.0):.2f}%`\n"
+            f"- Scene area used: `{float(scene_area_m2):.6f} m^2`\n"
             f"- SAM: `{PRESET_SAM_TYPE}`\n"
             f"- DINO for segmentation: `{PRESET_GDINO_MODEL_ID}` (GroundingDINO)\n"
             "- Volume/mass: not computed (depth not available)\n"
@@ -310,8 +316,7 @@ def run_app(image_path, text_prompt, mode, depth_map_path, density_kg_per_m3):
     else:
         area_px = pixel_area_m2(
             height_map.shape,
-            PRESET_REAL_WORLD_HEIGHT_M,
-            PRESET_REAL_WORLD_WIDTH_M,
+            scene_area_m2,
         )
         volume_m3 = float(np.sum(object_heights) * area_px)
         volume_l = volume_m3 * 1000.0
@@ -326,6 +331,7 @@ def run_app(image_path, text_prompt, mode, depth_map_path, density_kg_per_m3):
         f"- Detections: `{len(masks)}`\n"
         f"- Prompt mask coverage: `{float(np.mean(union_mask)*100.0):.2f}%`\n"
         f"- Object mask coverage: `{float(np.mean(object_mask)*100.0):.2f}%`\n"
+        f"- Scene area used: `{float(scene_area_m2):.6f} m^2`\n"
         f"- Estimated volume: `{volume_l:.4f} L`\n"
         f"- Estimated mass: `{mass_kg:.4f} kg` @ `{float(density_kg_per_m3):.1f} kg/m^3`\n"
         f"- Mean/Max height: `{mean_h:.2f}/{max_h:.2f} mm`\n"
@@ -356,6 +362,7 @@ Presets in this app:
 - Segmentation DINO: `{PRESET_GDINO_MODEL_ID}`
 - Depth model (default): `dinov3_vit7b16_dd`
 - Depth loading source: `{'local repo' if PRESET_DINOV3_REPO_DIR else PRESET_DINOV3_GITHUB_REPO}`
+- Default scene area: `{PRESET_SCENE_AREA_M2:.6f} m^2` (editable in UI)
 """
     )
 
@@ -372,6 +379,7 @@ Presets in this app:
                 type="filepath",
                 label="Optional 16-bit depth map override/fallback (*_depth_raw.png)",
             )
+            scene_area_m2 = gr.Number(value=PRESET_SCENE_AREA_M2, label="Scene area (m^2) for volume")
             density_kg_per_m3 = gr.Number(value=180.0, label="Density (kg/m^3) for mass")
             run_btn = gr.Button("Run", variant="primary")
 
@@ -382,10 +390,10 @@ Presets in this app:
 
     run_btn.click(
         fn=run_app,
-        inputs=[image_input, text_prompt, mode, depth_map_path, density_kg_per_m3],
+        inputs=[image_input, text_prompt, mode, depth_map_path, scene_area_m2, density_kg_per_m3],
         outputs=[seg_output, height_output, metrics_md],
     )
 
 
 if __name__ == "__main__":
-    blocks.launch(server_name="0.0.0.0", server_port=7861)
+    blocks.launch(server_name="0.0.0.0", server_port=7861, share=True)
