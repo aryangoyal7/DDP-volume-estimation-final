@@ -11,7 +11,7 @@ Setup:
   - Waste fluffs, so actual bulk > 18L — CF will tell us the correction
 
 Run:
-    python eval_results/run_iitb_calibration.py --device cuda:1
+    python evaluation/run_iitb_calibration.py --device cuda:1
 """
 
 import argparse
@@ -261,7 +261,7 @@ def make_depth_vis(depth_map, box_pts, img_rgb=None):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--img_dir",  default="solid_waste_dataset2_iitb_site_pho")
-    ap.add_argument("--out_dir",  default="eval_results/iitb_calibration")
+    ap.add_argument("--out_dir",  default="evaluation/iitb_calibration")
     ap.add_argument("--piles",    default="pile1,pile2,pile3")
     ap.add_argument("--device",   default="cuda:1")
     ap.add_argument("--models",   default="dinov3,dav2",
@@ -478,7 +478,7 @@ def main():
     print(f"  calibration_summary.json")
     print(f"  calibration_chart.png")
     print(f"  vis/ (depth maps + overlays for first image of each pile)")
-    print(f"\nVIS FILES TO INSPECT (in eval_results/iitb_calibration/vis/):")
+    print(f"\nVIS FILES TO INSPECT (in evaluation/iitb_calibration/vis/):")
     for model_name in models:
         for pile in piles:
             pile_dir = img_dir / pile

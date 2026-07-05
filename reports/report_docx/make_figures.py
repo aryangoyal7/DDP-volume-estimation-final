@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generate research-paper-quality figures for the volume estimation report,
-using the DepthAnythingV2 full-frame run (eval_results/`/per_image_results.csv)
+using the DepthAnythingV2 full-frame run (evaluation/`/per_image_results.csv)
 which matches the sane numbers reported in latex_report/main.tex.
 """
 import csv
@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Rectangle
 
-ROOT = Path("/home/bheeshmsharma/Karthikeyan_new/a_g/VLA-volume-estimation")
-FF   = ROOT / "eval_results" / "`"          # fullframe run output
+ROOT = Path(__file__).resolve().parents[2]
+FF   = ROOT / "evaluation" / "`"          # fullframe run output
 LTX  = ROOT / "latex_report" / "images"     # reusable visuals
 OUT  = ROOT / "report_docx" / "figures"
 OUT.mkdir(parents=True, exist_ok=True)

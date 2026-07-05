@@ -16,18 +16,18 @@ Advantages over depth-only:
   - Can classify waste type from the text prompt
 
 Usage:
-    python eval_results/eval_langsam.py \
+    python evaluation/eval_langsam.py \
         --img_dir solid_waste_dataset2_iitb_site_pho \
-        --out_dir eval_results/langsam_gpu \
+        --out_dir evaluation/langsam_gpu \
         --prompt "solid waste pile" \
         --box_area_m2 0.12 \
         --camera_height_m 1.0
 
     # For dataset_1 (comparing to GT):
-    python eval_results/eval_langsam.py \
+    python evaluation/eval_langsam.py \
         --img_dir dataset_1/jpg_by_object \
         --csv     dataset_1/eval_gt_volume_liters.csv \
-        --out_dir eval_results/langsam_dataset1 \
+        --out_dir evaluation/langsam_dataset1 \
         --prompt  "object waste item" \
         --scene_area_m2 0.3716 \
         --camera_height_m 0.45
@@ -248,7 +248,7 @@ def regression_metrics(y_true, y_pred):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--img_dir",         default="solid_waste_dataset2_iitb_site_pho")
-    ap.add_argument("--out_dir",         default="eval_results/langsam_gpu")
+    ap.add_argument("--out_dir",         default="evaluation/langsam_gpu")
     ap.add_argument("--prompt",          default="solid waste pile",
                     help="Text prompt for LangSAM segmentation")
     ap.add_argument("--box_threshold",   type=float, default=0.3)

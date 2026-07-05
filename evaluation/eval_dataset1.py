@@ -208,7 +208,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv",     default="dataset_1/eval_gt_volume_liters.csv")
     ap.add_argument("--img_dir", default="dataset_1/jpg_by_object")
-    ap.add_argument("--out_dir", default="eval_results/dataset1_gpu")
+    ap.add_argument("--out_dir", default="evaluation/dataset1_gpu")
     ap.add_argument("--device",  default="cuda:1")
     args = ap.parse_args()
 

@@ -91,7 +91,7 @@ def estimate_depth_with_dinov3(image_pil: Image.Image, depther: torch.nn.Module,
     return depth_pred[0, 0].detach().cpu().numpy()
 
 
-def load_manual_box(image_np: np.ndarray, pile_folder: str, calibration_file: str = "box_calibration.json") -> Tuple[np.ndarray, float]:
+def load_manual_box(image_np: np.ndarray, pile_folder: str, calibration_file: str = "configs/box_calibration.json") -> Tuple[np.ndarray, float]:
     """
     Load the manual 4-point polygon for the white box from the calibration UI.
     """

@@ -11,7 +11,7 @@ Also checks the depth maps visually:
   - prints per-image sanity: pile shallower than edges (floor)?
 
 Usage:
-    python eval_results/run_iitb_fullframe.py --device cuda:1
+    python evaluation/run_iitb_fullframe.py --device cuda:1
 """
 
 import argparse
@@ -203,7 +203,7 @@ def save_vis(img_np, depth_map, hmap, diag, out_path_prefix):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--img_dir",  default="solid_waste_dataset2_iitb_site_pho")
-    ap.add_argument("--out_dir",  default="eval_results/iitb_fullframe")
+    ap.add_argument("--out_dir",  default="evaluation/iitb_fullframe")
     ap.add_argument("--piles",    default="pile1,pile2,pile3")
     ap.add_argument("--device",   default="cuda:1")
     ap.add_argument("--max_imgs", type=int, default=0)

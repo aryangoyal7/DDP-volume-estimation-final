@@ -12,12 +12,12 @@ Features:
   - Saves: per-image depth vis, height overlays, box boundary overlays, metrics JSON
 
 Usage:
-    python eval_results/eval_iitb.py \
+    python evaluation/eval_iitb.py \
         --img_dir solid_waste_dataset2_iitb_site_pho \
-        --out_dir eval_results/iitb_gpu \
+        --out_dir evaluation/iitb_gpu \
         --box_area_m2 0.12 \
         --camera_height_m 1.0 \
-        --gt_json eval_results/iitb_gt.json   # optional
+        --gt_json evaluation/iitb_gt.json   # optional
 
 GT JSON format (optional, fill in actual measured values):
 {
@@ -260,7 +260,7 @@ def draw_box_overlay(img_rgb: np.ndarray, box_pts: np.ndarray, height_map: np.nd
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--img_dir",          default="solid_waste_dataset2_iitb_site_pho")
-    ap.add_argument("--out_dir",          default="eval_results/iitb_gpu")
+    ap.add_argument("--out_dir",          default="evaluation/iitb_gpu")
     ap.add_argument("--piles",            default="pile1,pile2,pile3")
     ap.add_argument("--box_area_m2",      type=float, default=DEFAULT_BOX_AREA_M2,
                     help="Physical area of white box interior in m² (measure this!)")

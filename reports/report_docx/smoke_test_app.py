@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke test: import app_dav2_volume.estimate_volume and run it on one
+"""Smoke test: import app.estimate_volume and run it on one
 IITB image from each pile. Confirm the calibrated volumes match the
 report's pipeline within reasonable tolerance.
 """
@@ -8,12 +8,12 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-ROOT = Path("/home/bheeshmsharma/Karthikeyan_new/a_g/VLA-volume-estimation")
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from app_dav2_volume import estimate_volume, IITB_DEFAULTS
+from app import estimate_volume, IITB_DEFAULTS
 
-# Reference numbers from latex_report/main.tex and eval_results/`/per_image_results.csv
+# Reference numbers from latex_report/main.tex and evaluation/`/per_image_results.csv
 REFERENCE = {
     "pile1/IMG_7975.jpg": dict(raw_L=14.376, scale=0.2696, sanity_ok=True, sanity_diff_cm=6.53),
     "pile2/IMG_7983.jpg": dict(raw_L=38.737, scale=0.2894, sanity_ok=True, sanity_diff_cm=7.82),
@@ -23,7 +23,7 @@ REFERENCE = {
 ds_root = ROOT / "solid_waste_dataset2_iitb_site_pho"
 
 print("=" * 78)
-print(f"Smoke test: app_dav2_volume.estimate_volume in Full-frame mode")
+print(f"Smoke test: app.estimate_volume in Full-frame mode")
 print(f"IITB defaults: {IITB_DEFAULTS}")
 print("=" * 78)
 

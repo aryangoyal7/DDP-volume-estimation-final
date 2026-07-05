@@ -1,187 +1,166 @@
-# VLA Volume Estimation
+# Waste Volume Estimation from a Single RGB Image
 
-Vision-language pipeline for waste segmentation and volume/mass estimation:
+**Dual Degree Project (Master's Thesis) — Aryan Goyal**
 
-- `LangSAM` (GroundingDINO + SAM2.1) for text-guided masks
-- DINOv3 depth maps (generated separately) for geometry
-- Calibrated depth-to-height integration for volume and mass
+This repository estimates the **volume and mass of waste piles from a single RGB image**. It combines:
 
-This repo is conversational: you can run interactive prompt turns on one image (`conversational_vla.py`) and get per-turn segmentation + optional volume/mass estimates.
+- **DepthAnythingV2** (Metric-Indoor-Large) — metric monocular depth estimation
+- **LangSAM** (GroundingDINO + SAM 2.1) — text-prompted segmentation, so the pile of interest is selected with a natural-language prompt (e.g. `"waste pile"`, `"plastic bottles"`)
+- **SAM-3D pipeline** — back-projection of the segmented depth map to a 3D point cloud, with volume computed by height integration, voxel-grid counting, and convex hull
 
-![person.png](/assets/outputs/person.png)
+The estimated volume is converted to mass with a material bulk density (kg/m³).
 
-## Defaults in this repo
+## Method overview
 
-- SAM: `sam2.1_hiera_large`
-- GroundingDINO: `IDEA-Research/grounding-dino-base`
+Given one RGB image:
 
-These defaults are set in:
+1. **Depth** — DepthAnythingV2 predicts a metric depth map.
+2. **Segmentation (optional)** — LangSAM produces a pile mask from a text prompt. In full-frame mode this step is skipped and the whole image is integrated.
+3. **Floor fitting** — a plane is fit on the deepest pixels (the floor); the known camera height gives the metric scale `s = H_cam / median(floor depth)`.
+4. **Height map** — per-pixel height above the floor plane, `h = s · (d_plane − d)`, thresholded at 1 cm to suppress noise.
+5. **Volume** — Riemann sum of heights × pixel footprint area, corrected by a calibration factor (CF = 0.86, the global median derived from the ground-truth calibration set).
+6. **Mass** — `m = ρ · V` for a chosen bulk density.
 
-- `lang_sam/lang_sam.py`
-- `lang_sam/models/gdino.py`
-- `lang_sam/server.py`
-- `app.py`
+The SAM-3D variant (`evaluation/run_iitb_sam3d.py`) additionally exports the segmented point cloud as a `.ply` file and cross-checks the integrated volume against voxel-grid and convex-hull estimates.
 
-## Setup (GPU recommended)
+## Repository structure
 
-Prerequisites:
+```
+├── app.py                  # Demo portal (Gradio web app) — main entry point
+├── lang_sam/               # Text-prompted segmentation package (GroundingDINO + SAM 2.1)
+├── scripts/                # Batch pipelines and utilities
+│   ├── conversational_vla.py           # Multi-turn CLI: prompt → mask → volume/mass
+│   ├── run_langsam_dinov3_mass_volume.py  # Batch eval: LangSAM masks + depth maps
+│   ├── run_dinov3_volume_batch.py      # Depth-only batch volume estimation
+│   ├── run_volume_baseline.py          # Baseline (no text prompt, plane-fit floor)
+│   ├── run_volume_whitebox.py          # White-box dataset evaluation
+│   ├── run_mc_data_test.py             # SAM-3D + DAv2 on MRF bunker images
+│   └── annotate_tool.py                # White-box corner annotation tool
+├── evaluation/             # Evaluation scripts, ground truth, and run_all_evals.sh
+├── apps/legacy/            # Earlier app iterations (kept for provenance)
+├── configs/                # Calibration files (box_calibration.json)
+├── datasets/               # Sample images (spectralwaste, zero_dataset, iitb_cropped)
+├── notebooks/              # vla_inference.ipynb — single-image walkthrough
+├── docs/                   # Experiment notes and demo narration script
+├── reports/                # LaTeX thesis reports, DOCX report builder, slides
+└── assets/                 # Example images and outputs
+```
 
-- Python 3.10+
-- NVIDIA GPU + CUDA (recommended for SAM2.1 large)
+## Installation
 
-Install:
+Requirements: Python 3.10+, and an NVIDIA GPU with CUDA is strongly recommended (SAM 2.1 Large + DepthAnythingV2 Large).
 
 ```bash
+git clone https://github.com/aryangoyal7/DDP-volume-estimation-final.git
+cd DDP-volume-estimation-final
+
 python -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install -e .
 ```
 
-If you need a specific CUDA torch wheel, install torch first, then run `pip install -e .`.
+If you need a specific CUDA build of PyTorch, install `torch`/`torchvision` first, then run `pip install -e .`.
 
-## Run Modes
+Model weights (DepthAnythingV2, GroundingDINO, SAM 2.1) are downloaded automatically from Hugging Face on first run.
 
-### 1) Gradio app (interactive)
+### Docker
+
+```bash
+docker build -t waste-volume-estimation .
+docker run --gpus all -p 7862:7862 waste-volume-estimation
+```
+
+## Demo portal
+
+The main deliverable is a Gradio web app:
 
 ```bash
 python app.py
 ```
 
-Open: `http://0.0.0.0:8000/gradio`
+Open **http://localhost:7862**. Two modes are available:
 
-### 1b) Gradio app with volume output (new)
+| Mode | What it does |
+|---|---|
+| **Full-frame** | No segmentation — the whole image is integrated (matches the calibrated report pipeline). |
+| **Prompted segmentation** | Type a text prompt (e.g. `waste pile`); LangSAM masks the pile and only that region is integrated. |
 
-This is a separate file and does not modify the original app:
+Adjustable inputs: camera height, scene dimensions, calibration factor (per-pile presets or the global median CF = 0.86), and bulk density for mass. The app displays the depth map, segmentation mask, height map, and the estimated volume (litres) and mass (kg).
 
-```bash
-python app_volume.py
-```
+A narration script for recording a demo video is in `docs/demo_script.txt`.
 
-Open: `http://0.0.0.0:7861`
+### Conversational CLI
 
-It supports:
-
-- two modes only:
-  - `Segmentation only`
-  - `Segmentation + Volume`
-- prompt-based segmentation
-- volume mode defaults to DINOv3 depth inference
-- optional uploaded `*_depth_raw.png` (16-bit) as override/fallback
-- volume + mass estimates
-
-Optional preset env vars for DINOv3 depth mode:
+Multi-turn prompting on a single image:
 
 ```bash
-export DINOV3_REPO_DIR=/abs/path/to/dinov3/repo
-export DINOV3_BACKBONE_WEIGHTS=/abs/path/to/dinov3_backbone.pth
-export DINOV3_DEPTHER_WEIGHTS=SYNTHMIX
-export DINOV3_GITHUB_REPO=facebookresearch/dinov3
-```
-
-### 2) Conversational VLA (CLI)
-
-This is the multi-turn workflow.
-
-```bash
-python conversational_vla.py \
+python scripts/conversational_vla.py \
   --image /path/to/image.png \
-  --depth /path/to/aligned_depth_raw.png \
   --sam_type sam2.1_hiera_large \
   --gdino_model_id IDEA-Research/grounding-dino-base \
-  --real_world_height 1.0 \
-  --real_world_width 1.0 \
+  --real_world_height 1.0 --real_world_width 1.0 \
   --density_kg_per_m3 180
 ```
 
-Then type prompts like:
+Then type prompts (`mixed waste pile`, `plastic bottles`, `cardboard`); use `/save` to export and `/exit` to quit.
 
-- `mixed waste pile`
-- `plastic bottles`
-- `cardboard`
+## Reproducing the evaluation
 
-Commands:
-
-- `/help`
-- `/save`
-- `/exit`
-
-If `--depth` is passed, each turn also reports estimated volume and mass.
-
-### 3) Batch eval (DINOv3 depth + LangSAM masks)
+All quantitative results in the thesis are produced by the scripts in `evaluation/`:
 
 ```bash
-python run_langsam_dinov3_mass_volume.py \
-  --input_dir /path/to/rgb_dir \
-  --depth_dir /path/to/depth_dir \
-  --output_dir /path/to/output_dir \
-  --sam_type sam2.1_hiera_large \
-  --prompts "waste,garbage,trash,rubbish,debris" \
-  --real_world_height 1.0 \
-  --real_world_width 1.0 \
-  --min_height_threshold 0.005 \
-  --ground_percentile 99.9 \
-  --density_kg_per_m3 180 \
-  --save_debug
+bash evaluation/run_all_evals.sh
 ```
 
-With ground truth:
+Individual experiments:
 
 ```bash
---gt_csv /path/to/ground_truth.csv
+# DepthAnythingV2 full-frame pipeline on the IITB piles
+python evaluation/run_iitb_fullframe.py --device cuda:0
+
+# Calibration-factor derivation (calibration/held-out split)
+python evaluation/run_iitb_calibration.py --device cuda:0
+
+# SAM-3D pipeline: point cloud + 3 volume estimators + .ply export
+python evaluation/run_iitb_sam3d.py --device cuda:0 --prompt "plastic waste"
+
+# Point-cloud comparison (DAv2 vs DINOv3 depth)
+python evaluation/run_iitb_pointcloud.py --device cuda:0 --model both
 ```
 
-This computes MAE/RMSE/MAPE/R2 for volume and optional mass.
+Each script writes per-image results (CSV/JSON), visualisations, and aggregate metrics (MAE, RMSE, MAPE, R²) to a subdirectory of `evaluation/`. Ground-truth volumes for the IITB piles are in `evaluation/iitb_gt.json`.
 
-### 4) Notebook (hardcoded path + prompt)
+Batch evaluation with externally generated depth maps (`*_depth_raw.png`, 16-bit) is documented in `docs/langsam_dinov3_experiment.md`.
 
-Use:
+## Datasets
 
-- `notebooks/vla_inference.ipynb`
+Small image subsets are included for out-of-the-box runs:
 
-It has a single config cell where you hardcode:
+- `datasets/spectralwaste/` — SpectralWaste samples (conveyor-belt waste)
+- `datasets/zero_dataset/` — miscellaneous waste-pile photos
+- `datasets/iitb_cropped/` — cropped IITB white-box pile images
 
-- `image_path`
-- `prompt`
-- optional `depth_path`
-- thresholds and density
+The full IITB solid-waste dataset (piles with weighed ground truth) is documented in `reports/dataset_doc_latex/`.
 
-## DINOv3 depth notes
+## Thesis material
 
-This repo consumes aligned depth maps (`*_depth_raw.png`).  
-Generate these from your DINOv3 pipeline first, then run the batch eval here.
-
-Detailed workflow: `LANGSAM_DINOV3_EXPERIMENT.md`
-
-## Included image datasets
-
-This repo now includes the image-only subsets from your previous project:
-
-- `datasets/spectralwaste/` (5 images)
-- `datasets/zero_dataset/` (4 images)
-
-## Library usage
-
-```python
-from PIL import Image
-from lang_sam import LangSAM
-
-model = LangSAM(
-    sam_type="sam2.1_hiera_large",
-    gdino_model_id="IDEA-Research/grounding-dino-base",
-)
-image_pil = Image.open("./assets/car.jpeg").convert("RGB")
-results = model.predict([image_pil], ["wheel"])
-```
+- `reports/latex_report/` — main pipeline report (LaTeX)
+- `reports/latex_report_sam3d/` — SAM-3D pipeline report
+- `reports/latex_report_demo/` — demo write-up
+- `reports/slides/` — presentation slides
+- `reports/report_docx/` — DOCX report builder (`build_report.py`)
 
 ## Acknowledgments
 
-- [GroundingDINO](https://github.com/IDEA-Research/GroundingDINO)
-- [SAM2](https://github.com/facebookresearch/segment-anything-2)
+Built on top of these open-source projects:
+
+- [Depth Anything V2](https://github.com/DepthAnything/Depth-Anything-V2)
 - [lang-segment-anything](https://github.com/luca-medeiros/lang-segment-anything)
-- [LitServe](https://github.com/Lightning-AI/LitServe/)
+- [GroundingDINO](https://github.com/IDEA-Research/GroundingDINO)
+- [SAM 2](https://github.com/facebookresearch/segment-anything-2)
 - [Supervision](https://github.com/roboflow/supervision)
 
 ## License
 
-Apache 2.0
+Apache 2.0 — see [LICENSE](LICENSE).

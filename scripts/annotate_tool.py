@@ -11,7 +11,7 @@ IMG_PATHS = {
     "pile3": "solid_waste_dataset2_iitb_site_pho/pile3/IMG_7999.jpg"
 }
 
-CALIBRATION_FILE = "box_calibration.json"
+CALIBRATION_FILE = "configs/box_calibration.json"
 if os.path.exists(CALIBRATION_FILE):
     with open(CALIBRATION_FILE, "r") as f:
         polygon_data = json.load(f)
@@ -48,7 +48,7 @@ def extract_points(evt: gr.SelectData, pile_name, current_points):
     return json.dumps(points), f"Clicked {len(points)}/4 points."
 
 with gr.Blocks(title="Annotate White Box Corners") as demo:
-    gr.Markdown("# 📦 White Box Annotator\nSelect the pile below, then click the **4 corners** of the inside white box floor (clockwise or counter-clockwise). It will auto-save to `box_calibration.json` once you click 4 times.")
+    gr.Markdown("# 📦 White Box Annotator\nSelect the pile below, then click the **4 corners** of the inside white box floor (clockwise or counter-clockwise). It will auto-save to `configs/box_calibration.json` once you click 4 times.")
     
     with gr.Row():
         pile_dropdown = gr.Dropdown(choices=["pile1", "pile2", "pile3"], label="Select Pile", value="pile1")

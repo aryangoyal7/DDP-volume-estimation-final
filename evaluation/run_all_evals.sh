@@ -22,10 +22,10 @@ echo ""
 echo "============================================================"
 echo "EVAL 1: Dataset-1 (planar depth, no segmentation)"
 echo "============================================================"
-python3 eval_results/eval_dataset1.py \
+python3 evaluation/eval_dataset1.py \
     --csv     dataset_1/eval_gt_volume_liters.csv \
     --img_dir dataset_1/jpg_by_object \
-    --out_dir eval_results/dataset1_gpu \
+    --out_dir evaluation/dataset1_gpu \
     --device  $DEVICE
 
 # ─── EVAL 2: IITB full images (auto white-box detection) ────────────────────
@@ -33,13 +33,13 @@ echo ""
 echo "============================================================"
 echo "EVAL 2: IITB full images (auto white-box detection)"
 echo "============================================================"
-python3 eval_results/eval_iitb.py \
+python3 evaluation/eval_iitb.py \
     --img_dir         solid_waste_dataset2_iitb_site_pho \
-    --out_dir         eval_results/iitb_autobox \
+    --out_dir         evaluation/iitb_autobox \
     --piles           pile1,pile2,pile3 \
     --box_area_m2     $BOX_AREA \
     --camera_height_m $CAMERA_H_M \
-    --gt_json         eval_results/iitb_gt.json \
+    --gt_json         evaluation/iitb_gt.json \
     --device          $DEVICE
 
 # ─── EVAL 3: IITB pre-cropped (pile1 only) ──────────────────────────────────
@@ -47,13 +47,13 @@ echo ""
 echo "============================================================"
 echo "EVAL 3: IITB pre-cropped images (pile1)"
 echo "============================================================"
-python3 eval_results/eval_iitb.py \
-    --img_dir         cropped_dataset \
-    --out_dir         eval_results/iitb_cropped \
+python3 evaluation/eval_iitb.py \
+    --img_dir         datasets/iitb_cropped \
+    --out_dir         evaluation/iitb_cropped \
     --piles           pile1 \
     --box_area_m2     $BOX_AREA \
     --camera_height_m $CAMERA_H_M \
-    --gt_json         eval_results/iitb_gt.json \
+    --gt_json         evaluation/iitb_gt.json \
     --pre_cropped \
     --device          $DEVICE
 
@@ -62,18 +62,18 @@ echo ""
 echo "============================================================"
 echo "EVAL 4: LangSAM segmentation + DINOv3 depth (IITB)"
 echo "============================================================"
-python3 eval_results/eval_langsam.py \
+python3 evaluation/eval_langsam.py \
     --img_dir         solid_waste_dataset2_iitb_site_pho \
-    --out_dir         eval_results/langsam_iitb \
+    --out_dir         evaluation/langsam_iitb \
     --mode            iitb \
     --prompt          "solid waste pile" \
     --scene_area_m2   $BOX_AREA \
     --camera_height_m $CAMERA_H_M \
-    --gt_json         eval_results/iitb_gt.json \
+    --gt_json         evaluation/iitb_gt.json \
     --device          $DEVICE
 
 echo ""
 echo "============================================================"
 echo "ALL EVALUATIONS COMPLETE"
-echo "Results in: eval_results/"
+echo "Results in: evaluation/"
 echo "============================================================"

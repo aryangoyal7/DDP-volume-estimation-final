@@ -3,12 +3,12 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "lang-sam"
-version = "0.2.1"
-description = "Language segment-anything"
+name = "waste-volume-estimation"
+version = "1.0.0"
+description = "Text-prompted waste volume estimation from a single RGB image (DepthAnythingV2 + LangSAM + SAM-3D)"
 readme = "README.md"
 authors = [
-  { name = "Luca Medeiros", email = "lucamedeiros@outlook.com" },
+  { name = "Aryan Goyal" },
 ]
 requires-python = ">=3.10"
 dynamic = ["dependencies"]

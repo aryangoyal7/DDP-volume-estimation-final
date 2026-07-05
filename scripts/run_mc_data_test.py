@@ -19,7 +19,7 @@ from PIL import Image
 from transformers import AutoImageProcessor, AutoModelForDepthEstimation
 
 warnings.filterwarnings("ignore")
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lang_sam import LangSAM
 
 # ── assumptions ──────────────────────────────────────────────────────────────
@@ -35,8 +35,8 @@ DAV2_ID  = "depth-anything/Depth-Anything-V2-Metric-Indoor-Large-hf"
 SAM_TYPE = "sam2.1_hiera_large"
 GDINO_ID = "IDEA-Research/grounding-dino-base"
 
-SRC_DIR  = Path(__file__).resolve().parent / "mc_data_test"
-OUT_DIR  = Path(__file__).resolve().parent / "eval_results" / "mc_data_test"
+SRC_DIR  = Path(__file__).resolve().parents[1] / "mc_data_test"
+OUT_DIR  = Path(__file__).resolve().parents[1] / "evaluation" / "mc_data_test"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DEVICE   = "cuda" if torch.cuda.is_available() else "cpu"

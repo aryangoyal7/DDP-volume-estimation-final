@@ -21,9 +21,9 @@ Pipeline per image:
   6. Calibration: first CALIB_N images per pile -> CF; remaining -> evaluation
 
 Usage:
-    python eval_results/run_iitb_pointcloud.py --device cuda:1
-    python eval_results/run_iitb_pointcloud.py --device cuda:1 --model dinov3
-    python eval_results/run_iitb_pointcloud.py --device cuda:1 --model both
+    python evaluation/run_iitb_pointcloud.py --device cuda:1
+    python evaluation/run_iitb_pointcloud.py --device cuda:1 --model dinov3
+    python evaluation/run_iitb_pointcloud.py --device cuda:1 --model both
 """
 
 import argparse, csv, json, os, sys, time, warnings
@@ -453,7 +453,7 @@ def main():
     args = ap.parse_args()
 
     device = torch.device(args.device)
-    out_root = Path("eval_results/iitb_pointcloud")
+    out_root = Path("evaluation/iitb_pointcloud")
     out_root.mkdir(parents=True, exist_ok=True)
 
     print("="*60)

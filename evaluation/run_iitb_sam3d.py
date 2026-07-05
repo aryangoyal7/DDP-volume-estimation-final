@@ -18,8 +18,8 @@ Pipeline per image:
      applied blindly to the held-out evaluation partition.
 
 Usage:
-    python eval_results/run_iitb_sam3d.py --device cuda:1
-    python eval_results/run_iitb_sam3d.py --device cuda:1 --prompt "plastic waste"
+    python evaluation/run_iitb_sam3d.py --device cuda:1
+    python evaluation/run_iitb_sam3d.py --device cuda:1 --prompt "plastic waste"
 """
 
 import argparse, csv, json, os, sys, time, warnings
@@ -328,7 +328,7 @@ def run(args):
     device = args.device
     prompt = args.prompt
 
-    out_root  = Path("eval_results/sam3d_iitb")
+    out_root  = Path("evaluation/sam3d_iitb")
     vis_dir   = out_root / "vis"
     ply_dir   = out_root / "point_clouds"
     for d in [out_root, vis_dir, ply_dir]:

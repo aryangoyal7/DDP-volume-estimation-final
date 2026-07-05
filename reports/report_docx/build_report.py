@@ -11,14 +11,14 @@ from docx import Document
 from docx.shared import Pt, Cm, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-ROOT = Path("/home/bheeshmsharma/Karthikeyan_new/a_g/VLA-volume-estimation")
+ROOT = Path(__file__).resolve().parents[2]
 FIGS = ROOT / "report_docx" / "figures"
-FF   = ROOT / "eval_results" / "`"
+FF   = ROOT / "evaluation" / "`"
 OUT_DOCX = ROOT / "report_docx" / "VolumeEstimation_Report.docx"
 
 # ── data --------------------------------------------------------------------
 summary = json.loads((FF / "calibration_summary.json").read_text())
-iitb_gt = json.loads((ROOT / "eval_results" / "iitb_gt.json").read_text())
+iitb_gt = json.loads((ROOT / "evaluation" / "iitb_gt.json").read_text())
 
 # Numbers used in the body — kept consistent with latex_report/main.tex
 PAPER = {

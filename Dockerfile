@@ -12,13 +12,13 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     git
 
-COPY . /lang-segment-anything
+COPY . /waste-volume-estimation
 
 # Install dependencies
-WORKDIR /lang-segment-anything
+WORKDIR /waste-volume-estimation
 RUN pip install -r requirements.txt
 
-EXPOSE 8000
+EXPOSE 7862
 
 # Entry point
 CMD ["python3", "app.py"]

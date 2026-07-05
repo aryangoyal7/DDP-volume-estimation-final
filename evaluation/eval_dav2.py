@@ -12,8 +12,8 @@ Modes:
   --mode iitb      : IITB solid waste piles
 
 Usage:
-    python eval_results/eval_dav2.py --mode dataset1 --device cuda:1
-    python eval_results/eval_dav2.py --mode iitb --device cuda:1 \
+    python evaluation/eval_dav2.py --mode dataset1 --device cuda:1
+    python evaluation/eval_dav2.py --mode iitb --device cuda:1 \
         --box_area_m2 0.12 --camera_height_m 1.0
 """
 
@@ -243,11 +243,11 @@ def main():
     ap.add_argument("--piles",           default="pile1,pile2,pile3")
     ap.add_argument("--box_area_m2",     type=float, default=0.12)
     ap.add_argument("--camera_height_m", type=float, default=1.0)
-    ap.add_argument("--gt_json",         default="eval_results/iitb_gt.json")
+    ap.add_argument("--gt_json",         default="evaluation/iitb_gt.json")
     args = ap.parse_args()
 
     if args.out_dir is None:
-        args.out_dir = f"eval_results/dav2_{args.mode}"
+        args.out_dir = f"evaluation/dav2_{args.mode}"
     out_dir = Path(args.out_dir)
     vis_dir = out_dir / "vis"
     vis_dir.mkdir(parents=True, exist_ok=True)
